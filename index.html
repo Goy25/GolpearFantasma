@@ -3,17 +3,54 @@
   <head>
     <title>WebGL 2.0</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style>
+      .campo {
+        padding: 10px;
+        display: flex;
+        max-height: 20px;
+        align-items: center;
+      }
+
+      #puntuacion {
+        margin-right: 5px;
+      }
+
+      label {
+        width: 220px;
+        margin-right: 5px;
+      }
+
+      input[type="number"] {
+        width: 40px;
+      }
+    </style>
   </head>
   <body>
     <h2>Golpear fantasmas</h2>
-    <div style="display: flex;">
+    <div class="campo">
       <p style="margin-right: 5px;">Puntuacion: </p>
       <p id="puntuacion">0</p>
-    </div>
-    <div style="padding: 10px; display: flex; max-height: 20px; align-items: center;">
-      <p style="margin-right: 5px;">Cantidad de fantasmas: </p>
-      <input type="number" style="width: 40px;" value="5" id="cGus">
       <button id="jugar" onclick="ejecutar()">Jugar</button>
+    </div>
+    <div class="campo">
+      <div class="campo">
+        <label>Cantidad de fantasmas: </label>
+        <input type="number" value="5" id="cFant"  onchange="valCFantasmas()">
+      </div>
+      <div class="campo">
+        <label>Tiempo de juego (seg): </label>
+        <input type="number" value="30" id="cTiempo" onchange="valTJuego()">
+      </div>
+    </div>
+    <div class="campo">
+      <div class="campo">
+        <label>Cantidad de Reemplazos: </label>
+        <input type="number" value="1" id="cReemp" onchange="valCReemp()">
+      </div>
+      <div class="campo">
+        <label>Tiempo entre Reemplazos (seg): </label>
+        <input type="number" value="1" id="tReemp" onchange="valTReemp()">
+      </div>
     </div>
     <canvas id="webglcanvas" style="border: none" width="500" height="500">
     </canvas>
@@ -268,7 +305,42 @@
         for (i = 0; i < 16; i++) c[i] = r[i];
       }
 
-      var canvas, gl, fantasmas, cantfantasmas;
+      var canvas, gl, fantasmas, cantFantasmas, posiciones, tJuego, tReemp, cReemp;
+      var intervalo, puntuacion = 0;
+      const jugar = document.getElementById("jugar"), marcador = document.getElementById("puntuacion");
+
+      function valCFantasmas () {
+        cantFantasmas = parseInt(document.getElementById("cFant").value);
+        if (cantFantasmas < 1) {
+          document.getElementById("cFant").value = 1;
+        }
+        valCReemp();
+      }
+
+      function valTJuego () {
+        tJuego = parseInt(document.getElementById("cTiempo").value);
+        if (tJuego < 5) {
+          document.getElementById("cTiempo").value = 5;
+        }
+      }
+
+      function valTReemp () {
+        tReemp = parseInt(document.getElementById("tReemp").value);
+        if (tReemp < 1) {
+          document.getElementById("tReemp").value = 1;
+        }
+      }
+
+      function valCReemp () {
+        cantFantasmas = parseInt(document.getElementById("cFant").value);
+        cReemp = parseInt(document.getElementById("cReemp").value);
+        if (cReemp < 1) {
+          document.getElementById("cReemp").value = 1;
+        }
+        if (cReemp > cantFantasmas) {
+          document.getElementById("cReemp").value = cantFantasmas;
+        }
+      }
 
       function fantasma (x, y) {
         var fantasma = new Array(1808);
@@ -352,19 +424,25 @@
       }
 
       function esconder() {
-        let i = Math.floor(Math.random() * (cantFantasmas + .9));
-        fantasmas[i*2] = Math.random() * 18 - 10;
-        fantasmas[i*2+1] = Math.random() * 17 - 10;
+        for (let i = cantFantasmas - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [posiciones[i], posiciones[j]] = [posiciones[j], posiciones[i]];
+        }
+        for (let i = 0; i < cReemp; i++) {
+          fantasmas[posiciones[i]*2] = Math.random() * 18 - 10;
+          fantasmas[posiciones[i]*2+1] = Math.random() * 17 - 10;
+        }
         graficarFantasmas(fantasmas);
       }
-    
-      var intervalo, puntuacion = 0;
-      const jugar = document.getElementById("jugar"), marcador = document.getElementById("puntuacion");
       
       function ejecutar () {
         puntuacion = 0;
         marcador.textContent = puntuacion;
-        cantFantasmas = parseInt(document.getElementById("cGus").value);
+        cantFantasmas = parseInt(document.getElementById("cFant").value);
+        tJuego = parseInt(document.getElementById("cTiempo").value) * 1000;
+        tReemp = parseInt(document.getElementById("tReemp").value) * 1000;
+        cReemp = parseInt(document.getElementById("cReemp").value);
+        posiciones = Array.from({ length: cantFantasmas }, (_, index) => index);
         fantasmas = new Array(cantFantasmas * 2);
         for (let i=0; i<cantFantasmas*2; i+=2) {
           let x = Math.random() * 18 - 10;
@@ -374,11 +452,11 @@
         }
         graficarFantasmas(fantasmas)
         jugar.disabled = true;
-        intervalo = setInterval(esconder, 1000);
+        intervalo = setInterval(esconder, tReemp);
         setTimeout(function() {
           clearInterval(intervalo);
           jugar.disabled = false;
-        }, 30000);
+        }, tJuego);
       }
 
       function puntoEstaDentroDelRectangulo(posx, posy, x, y) {
