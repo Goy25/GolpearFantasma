@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <link rel="shortcut icon" href="./Bird.png" type="image/x-icon">
+  <title>Flappy Bird en WebGL 2.0</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+</head>
+   <body>
+      <h2>Flappy Bird</h2>
+      <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+      <img src="./Background.jpeg" id="Background" hidden />
+      <img src="./Bird.png" id="Bird" hidden />
+      <img src="./Pipe.png" id="Pipe" hidden />
+      <img src="./Gameover.png" id="Gameover" hidden />
+      <img src="./Inicio.png" id="Inicio" hidden />
+      <img src="./0.png" id="0" hidden />
+      <img src="./1.png" id="1" hidden />
+      <img src="./2.png" id="2" hidden />
+      <img src="./3.png" id="3" hidden />
+      <img src="./4.png" id="4" hidden />
+      <img src="./5.png" id="5" hidden />
+      <img src="./6.png" id="6" hidden />
+      <img src="./7.png" id="7" hidden />
+      <img src="./8.png" id="8" hidden />
+      <img src="./9.png" id="9" hidden />
+      <!--
+        /***************************************************************************/
+        /* Se definen los códigos shaders.                                         */
+        /***************************************************************************/
+      -->
+      <script id="vs" type="vertex">
+        #version 300 es
+        precision mediump float;
+        uniform mat4 uMatrizProyeccion;
+        uniform mat4 uMatrizVista;
+        uniform mat4 uMatrizModelo;
+        layout(location = 0) in vec2 aVertices;
+        layout(location = 1) in vec2 aCoordenadasDeTextura;
+        out vec2 vCoordenadasDeTextura;
+        void main() {
+            vCoordenadasDeTextura = aCoordenadasDeTextura;  
+            gl_Position = uMatrizProyeccion * uMatrizVista * uMatrizModelo * vec4(aVertices, 0.0, 1.0);
+        }
+      </script>
+
+      <script id="fs" type="fragment">
+        #version 300 es
+        precision mediump float;
+        uniform sampler2D uUnidadDeTextura;
+        in vec2 vCoordenadasDeTextura;
+        out vec4 color;
+        void main() {
+            color = texture(uUnidadDeTextura, vCoordenadasDeTextura); 
+        }
+      </script>
+	
+      <script src="./FlappyBird.js">
+      </script>
+   </body>
+</html>
