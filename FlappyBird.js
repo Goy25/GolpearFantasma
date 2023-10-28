@@ -608,26 +608,26 @@ document.addEventListener("keydown", function (event) {
       movY = 0.05;
       lastPos = bird.ty;
     }
-    else {
-      seguir = true;
-      bird = new Rectangulo(gl, -0.25, -0.25, 0.25, 0.25, -2.75);
-      pipes = [];
-      codigoPipes = [];
-      for (let i = 0; i < 4; i++) {
-        const y = Math.random() * 4 - 3;
-    
-        pipes.push(new Pipe(gl, i, -5, y));
-        codigoPipes.push(gl.createTexture());
-        leeLaTextura(gl, "Pipe", codigoPipes[pipes.length - 1]);
-    
-        pipes.push(new Pipe(gl, i, 5, y + 2));
-        codigoPipes.push(gl.createTexture());
-        leeLaTextura(gl, "Pipe", codigoPipes[pipes.length - 1]);
-      }
-      pipetx = 0;
-      score = 0;
-      dibuja()
+  }
+  if (event.keyCode == 13) {
+    seguir = true;
+    bird = new Rectangulo(gl, -0.25, -0.25, 0.25, 0.25, -2.75);
+    pipes = [];
+    codigoPipes = [];
+    for (let i = 0; i < 4; i++) {
+      const y = Math.random() * 4 - 3;
+  
+      pipes.push(new Pipe(gl, i, -5, y));
+      codigoPipes.push(gl.createTexture());
+      leeLaTextura(gl, "Pipe", codigoPipes[pipes.length - 1]);
+  
+      pipes.push(new Pipe(gl, i, 5, y + 2));
+      codigoPipes.push(gl.createTexture());
+      leeLaTextura(gl, "Pipe", codigoPipes[pipes.length - 1]);
     }
+    pipetx = 0;
+    score = 0;
+    dibuja()
   }
 });
 
